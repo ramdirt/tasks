@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from handlers.ping import router as ping_router
+from handlers import routers
 
 app = FastAPI()
 
-app.include_router(router=ping_router)
+
+for router in routers:
+    app.include_router(router)
