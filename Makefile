@@ -3,11 +3,14 @@
 run: ## start server
 	poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .local.env
 
-install:
-	poetry add $(LIBBARY)
+add:
+	poetry add $(LIBRARY)
 
-uninstall:
-	poetry remove $(LIBBARY)
+remove:
+	poetry remove $(LIBRARY)
 
 help: ## help command
 	@echo "Help"
+
+migrate-create:
+	poetry run alembic revision --autogenerate -m $(MIGRATION)

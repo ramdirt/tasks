@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from schema.task import Task
-from database import get_db_connection
+from repository.task import get_tasks_repository
 
 from fixtures import tasks as fixtures_tasks
 
@@ -12,19 +12,7 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
     response_model=list[Task]
 )
 async def get_tasks():
-    result: list[Task] = []
-
-    cursor = get_db_connection().cursor()
-    tasks = cursor.execute("SELECT * FROM tasks").fetchall()
-    for task in tasks:
-        result.append(Task(
-            id=task[0],
-            name=task[1],
-            pomodoro_count=task[2],
-            category_id=task[3]
-        ))
-
-    return fixtures_tasks
+    return get_tasks_repository().get_tasks()
 
 
 @router.post(
@@ -32,16 +20,10 @@ async def get_tasks():
     response_model=Task
 )
 async def create_task(task: Task):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute(
-        "INSERT INTO tasks (id, name, pomodoro_count, category_id) VALUES (?,?,?,?)",
-        (task.id, task.name, task.pomodoro_count, task.category_id)
-    )
-    connection.commit()
-    connection.close()
 
-    fixtures_tasks.append(task)
+    get_tasks_repository().create_task(task)
+
+
     return task
 
 
@@ -50,11 +32,6 @@ async def create_task(task: Task):
     response_model=Task
 )
 async def update_task(task_id: int, name: str):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("UPDATE tasks SET name =? WHERE id =?", (name, task_id))
-    connection.commit()
-    connection.close()
 
 
     for task in fixtures_tasks:
