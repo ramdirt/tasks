@@ -13,4 +13,17 @@ help: ## help command
 	@echo "Help"
 
 migrate-create:
-	poetry run alembic revision --autogenerate -m $(MIGRATION)
+	poetry run alembic revision --autogenerate -m "$(DESCRIPTION)"
+
+migrate-apply:
+	poetry run alembic upgrade head
+
+migrate-downgrade:
+	poetry run alembic downgrade base $(HASH)
+
+migrate-reset:
+	poetry run alembic downgrade base
+
+migrate-restart:
+	make migrate-reset
+	make migrate-apply

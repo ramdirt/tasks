@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, declared_attr
 
 # Тут маппинг моделей из базы данных
@@ -26,5 +26,5 @@ class Categories(Base):
     __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[str]
+    type: Mapped[Optional[str]]
     name: Mapped[str]
