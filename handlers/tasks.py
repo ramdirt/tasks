@@ -32,6 +32,15 @@ async def get_tasks():
     response_model=Task
 )
 async def create_task(task: Task):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO tasks (id, name, pomodoro_count, category_id) VALUES (?,?,?,?)",
+        (task.id, task.name, task.pomodoro_count, task.category_id)
+    )
+    connection.commit()
+    connection.close()
+
     fixtures_tasks.append(task)
     return task
 
@@ -41,6 +50,13 @@ async def create_task(task: Task):
     response_model=Task
 )
 async def update_task(task_id: int, name: str):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE tasks SET name =? WHERE id =?", (name, task_id))
+    connection.commit()
+    connection.close()
+
+
     for task in fixtures_tasks:
         if task["id"] == task_id:
             task["name"] = name
