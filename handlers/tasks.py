@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status
 from schema.task import Task
+from database import get_db_connection
 
 from fixtures import tasks as fixtures_tasks
 
@@ -11,6 +12,18 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
     response_model=list[Task]
 )
 async def get_tasks():
+    result: list[Task] = []
+
+    cursor = get_db_connection().cursor()
+    tasks = cursor.execute("SELECT * FROM tasks").fetchall()
+    for task in tasks:
+        result.append(Task(
+            id=task[0],
+            name=task[1],
+            pomodoro_count=task[2],
+            category_id=task[3]
+        ))
+
     return fixtures_tasks
 
 
