@@ -22,6 +22,7 @@ class Tasks(Base):
     pomodoro_count: Mapped[int]
     category_id: Mapped[int]
 
+
 class Categories(Base):
     __tablename__ = "categories"
 

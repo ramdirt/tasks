@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Тут подключение к базе данных
 
-engine = create_engine("sqlite:///tasks.sqlite")
+engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5432/postgres")
 
 Session = sessionmaker(engine)
 

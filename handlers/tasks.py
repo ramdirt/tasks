@@ -1,6 +1,9 @@
-from fastapi import APIRouter, status
-from schema.task import Task
-from repository.task import get_tasks_repository
+from typing import Annotated
+from dependecy import get_tasks_repository
+
+from fastapi import APIRouter, status, Depends
+from schema.task import TaskSchema
+from repository import TaskRepository
 
 from fixtures import tasks as fixtures_tasks
 
@@ -9,41 +12,49 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 @router.get(
     "/all",
-    response_model=list[Task]
+    response_model=list[TaskSchema]
 )
-async def get_tasks():
-    return get_tasks_repository().get_tasks()
+async def get_tasks(task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)]):
+    tasks = task_repository.get_tasks()
+
+    return tasks
 
 
 @router.post(
     "/",
-    response_model=Task
+    response_model=TaskSchema
 )
-async def create_task(task: Task):
+async def create_task(
+    task: TaskSchema,
+    task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)]
+):
 
-    get_tasks_repository().create_task(task)
-
+    task_id = task_repository.create_task(task)
+    task.id = task_id
 
     return task
 
 
 @router.put(
     "/{task_id}",
-    response_model=Task
+    response_model=TaskSchema
 )
 async def update_task(task_id: int, name: str):
-
-
-    for task in fixtures_tasks:
-        if task["id"] == task_id:
-            task["name"] = name
-            return task
+    pass
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(task_id: int):
-    for index, task in enumerate(fixtures_tasks):
-        if task["id"] == task_id:
-            del fixtures_tasks[index]
-            return {"message": "task deleted"}
-        return {"message": "task not found"}
+    pass
+
+
+@router.patch(
+        "/{task_id}",
+        response_model=TaskSchema
+        )
+async def patch_task(
+    task_id: int,
+    name: str,
+    task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)]
+):
+    return task_repository.update_task_name(task_id, name)

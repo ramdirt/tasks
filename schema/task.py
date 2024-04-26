@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field, model_validator, field_validator, ValidationInfo
+from pydantic import BaseModel, model_validator
 
 
-class Task(BaseModel):
+class TaskSchema(BaseModel):
     id: int | None = None
     name: str | None = None
     pomodoro_count: int | None = None
