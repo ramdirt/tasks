@@ -1,11 +1,9 @@
 from typing import Annotated
-from dependecy import get_tasks_repository
+from dependecy import get_tasks_cache_repository, get_tasks_repository
 
 from fastapi import APIRouter, status, Depends
 from schema.task import TaskSchema
-from repository import TaskRepository
-
-from fixtures import tasks as fixtures_tasks
+from repository import TaskRepository, TaskCache
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -14,8 +12,16 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
     "/all",
     response_model=list[TaskSchema]
 )
-async def get_tasks(task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)]):
+async def get_tasks(
+    task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)],
+    task_cache: Annotated[TaskCache, Depends(get_tasks_cache_repository)]
+):
+    if tasks := task_cache.get_tasks():
+        return tasks
+    
     tasks = task_repository.get_tasks()
+    tasks_schema = [TaskSchema.model_validate(task) for task in tasks]
+    task_cache.set_tasks(tasks_schema)
 
     return tasks
 
@@ -44,9 +50,13 @@ async def update_task(task_id: int, name: str):
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(task_id: int):
-    pass
+async def delete_task(
+    task_id: int,
+    task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)]
+):
+    task_repository.delete_task(task_id)
 
+    return {"message": "deleted"}
 
 @router.patch(
         "/{task_id}",

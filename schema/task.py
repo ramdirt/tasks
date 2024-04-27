@@ -10,6 +10,10 @@ class TaskSchema(BaseModel):
     # before - срабатывает до инициализации класса
     # after - после инициализации, поэтому у функции будет аргрумент self
 
+    class Config:
+        from_attributes = True
+
+
     @model_validator(mode="after")
     def check_name_or_pomodoro_count_is_not_none(self):
         if self.name is None and self.pomodoro_count is None:
