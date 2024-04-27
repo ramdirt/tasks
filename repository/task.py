@@ -59,7 +59,7 @@ class TaskRepository():
         return tasks
     
 
-    def update_task_name(self, task_id: int, name: str) -> Tasks:
+    def update_name(self, task_id: int, name: str) -> Tasks:
         query = update(Tasks).where(Tasks.id == task_id).values(name=name).returning(Tasks.id)
         
         with self.db_session() as session:

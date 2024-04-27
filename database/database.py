@@ -1,9 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Тут подключение к базе данных
+from settings import Settings
 
-engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5432/postgres")
+settings = Settings()
+
+engine = create_engine(settings.db_url)
 
 Session = sessionmaker(engine)
 

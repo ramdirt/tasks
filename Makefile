@@ -1,6 +1,7 @@
 .DEFAULT_GOLAD := help
 
 run: ## start server
+	docker-compose up -d
 	poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .local.env
 
 add:
