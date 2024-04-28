@@ -29,3 +29,11 @@ class UserRepository:
             user: User = session.execute(query).scalar_one_or_none()
 
         return user
+    
+    def get_user_by_username(self, username: str) -> User | None:
+        query = select(User).where(User.username == username)
+
+        with self.db_session() as session:
+            user: User = session.execute(query).scalar_one_or_none()
+
+        return user

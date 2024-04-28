@@ -2,7 +2,7 @@ from fastapi import Depends
 from database import get_db_session
 from cache import get_redis_connection
 from repository import TaskRepository, TaskCache, UserRepository
-from service import TaskService, UserService
+from service import TaskService, UserService, AuthService
 from sqlalchemy.orm import Session
 
 
@@ -30,3 +30,7 @@ def get_users_repository(db_session: Session = Depends(get_db_session)) -> UserR
 
 def get_user_service(user_repository: UserRepository = Depends(get_users_repository)) -> UserService:
     return UserService(user_repository=user_repository)
+
+# Auth
+def get_auth_service(user_repository: UserRepository = Depends(get_users_repository)) -> AuthService:
+    return AuthService(user_repository=user_repository)
