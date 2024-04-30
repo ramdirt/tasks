@@ -29,6 +29,15 @@ class TaskRepository():
 
         return task
     
+    def get_user_task(self, user_id: int, task_id: int) -> Task | None:
+        query = select(Task).where(Task.user_id == user_id, Task.id == task_id)
+
+        with self.db_session() as session:
+            task: Task = session.execute(query).scalar_one_or_none()
+
+        return task
+
+    
 
     def create_task(self, task: TaskCreateSchema, user_id: int) -> int:
         task_model = Task(
