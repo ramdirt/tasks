@@ -7,11 +7,10 @@ from sqlalchemy.orm import Session
 class UserRepository:
     db_session: Session
 
-    def create_user(self, username: str, password: str, access_token: str) -> User:
+    def create_user(self, username: str, password: str) -> User:
         query = insert(User).values(
             username=username,
             password=password,
-            access_token=access_token
         ).returning(User.id)
 
         with self.db_session() as session:
@@ -29,6 +28,7 @@ class UserRepository:
             user: User = session.execute(query).scalar_one_or_none()
 
         return user
+    
     
     def get_user_by_username(self, username: str) -> User | None:
         query = select(User).where(User.username == username)

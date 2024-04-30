@@ -5,6 +5,8 @@ from repository import TaskRepository, TaskCache, UserRepository
 from service import TaskService, UserService, AuthService
 from sqlalchemy.orm import Session
 
+from settings import Settings
+
 
 # Tasks
 def get_tasks_repository(db_session: Session = Depends(get_db_session)) -> TaskRepository:
@@ -22,15 +24,24 @@ def get_task_service(
     return TaskService(task_repository=task_repository, task_cache=task_cache)
 
 
-
-# Users
 def get_users_repository(db_session: Session = Depends(get_db_session)) -> UserRepository:
     return UserRepository(db_session=db_session)
 
 
-def get_user_service(user_repository: UserRepository = Depends(get_users_repository)) -> UserService:
-    return UserService(user_repository=user_repository)
+def get_auth_service(
+        user_repository: UserRepository = Depends(get_users_repository)
+) -> AuthService:
+    return AuthService(
+        user_repository=user_repository,
+        settings= Settings()
+        )
 
-# Auth
-def get_auth_service(user_repository: UserRepository = Depends(get_users_repository)) -> AuthService:
-    return AuthService(user_repository=user_repository)
+
+def get_user_service(
+        user_repository: UserRepository = Depends(get_users_repository),
+        auth_service: AuthService = Depends(get_auth_service)
+) -> UserService:
+    return UserService(
+        user_repository=user_repository,
+        auth_service=auth_service
+    )
