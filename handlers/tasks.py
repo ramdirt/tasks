@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, status, Depends
 
-from dependecy import get_task_service
-from schema import TaskSchema
+from dependecy import get_task_service, get_request_user_id
+from schema import TaskSchema, TaskCreateSchema
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -21,9 +21,12 @@ async def get_task(task_id: int, task_service: task_service):
 
 
 @router.post("/", response_model=TaskSchema)
-async def create_task(task: TaskSchema, task_service: task_service):
-
-    return task_service.create_task(task)
+async def create_task(
+    body: TaskCreateSchema,
+    task_service: task_service,
+    user_id: int = Depends(get_request_user_id)
+):
+    return task_service.create_task(body, user_id)
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)

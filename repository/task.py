@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from models import Task, Category
 from schema import TaskSchema
 from database import get_db_session
+from schema.task import TaskCreateSchema
 
 class TaskRepository():
 
@@ -29,11 +30,12 @@ class TaskRepository():
         return task
     
 
-    def create_task(self, task: TaskSchema) -> int:
+    def create_task(self, task: TaskCreateSchema, user_id: int) -> int:
         task_model = Task(
             name = task.name,
             pomodoro_count = task.pomodoro_count,
-            category_id = task.category_id
+            category_id = task.category_id,
+            user_id = user_id
         )
 
         with self.db_session() as session:

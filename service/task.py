@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from repository import TaskRepository, TaskCache
-from schema import TaskSchema
+from schema import TaskSchema, TaskCreateSchema
 
 
 @dataclass
@@ -24,8 +24,8 @@ class TaskService:
         return task
     
 
-    def create_task(self, task: TaskSchema) -> int:
-        task_id = self.task_repository.create_task(task)
+    def create_task(self, task: TaskCreateSchema, user_id: int) -> int:
+        task_id = self.task_repository.create_task(task=task, user_id=user_id)
 
         return self.get_task(task_id)
     

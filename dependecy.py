@@ -1,4 +1,5 @@
-from fastapi import Depends
+from exception import TokenExpireException, TokenNotCorrectException
+from fastapi import Depends, Request, security, Security, HTTPException, status
 from database import get_db_session
 from cache import get_redis_connection
 from repository import TaskRepository, TaskCache, UserRepository
@@ -45,3 +46,26 @@ def get_user_service(
         user_repository=user_repository,
         auth_service=auth_service
     )
+
+reusable_oauth2 = security.HTTPBearer()
+
+def get_request_user_id(
+        auth_service: AuthService = Depends(get_auth_service),
+        token: security.HTTPAuthorizationCredentials = Security(reusable_oauth2)
+) -> int:
+    try:
+        user_id = auth_service.get_user_id_from_access_token(token.credentials)
+
+    except TokenExpireException as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=e.detail
+        )
+    
+    except TokenNotCorrectException as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=e.detail
+        )
+
+    return user_id
